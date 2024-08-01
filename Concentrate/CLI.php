@@ -46,6 +46,11 @@ class Concentrate_CLI
     protected $compile = false;
 
     /**
+     * @var boolean
+     */
+    protected $clear = false;
+
+    /**
      * @var string
      */
     protected $webroot = './';
@@ -82,6 +87,10 @@ class Concentrate_CLI
             $this->setOptions($result->options);
             $this->setWebRoot($result->args['webroot']);
             $this->loadDataFiles();
+
+            if ($this->clear) {
+                $this->clearCompiledDirectory();
+            }
 
             if ($this->combine) {
                 $this->writeCombinedFiles();
@@ -143,6 +152,13 @@ class Concentrate_CLI
         ) {
             $this->verbosity = intval($options['verbose']);
         }
+
+        if (array_key_exists('clear', $options)
+            && $options['clear'] !== null
+        ) {
+            $this->clear = ($options['clear']) ? true : false;
+        }
+
 
         if (array_key_exists('combine', $options)
             && $options['combine'] !== null
@@ -217,6 +233,35 @@ class Concentrate_CLI
         }
 
         return $this;
+    }
+
+    protected function clearCompiledDirectory()
+    {
+        $directory = $this->webroot . DIRECTORY_SEPARATOR . 'compiled';
+
+        $confirm = $this->climate->confirm(
+            sprintf(
+                'Clear all files from %s?',
+                $directory
+            )
+        );
+
+        if (!$confirm) {
+            $this->climate->to('error')->out('Aborting.');
+            exit(1);
+        }
+
+        if ($this->verbosity >= self::VERBOSITY_MESSAGES) {
+            $this->climate->br();
+            $this->climate->out("Clearing all files from {$directory}:");
+        }
+
+        $files = glob($directory . DIRECTORY_SEPARATOR . '*');
+
+        foreach ($files as $file) {
+            $this->climate->out("...{$file}");
+        }
+
     }
 
     protected function writeCombinedFiles()

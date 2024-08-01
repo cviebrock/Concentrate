@@ -29,6 +29,12 @@
 		<description>Write compiled LESS files. See http://www.lesscss.org/.</description>
 		<action>StoreTrue</action>
 	</option>
+  <option name="clear">
+    <short_name>-x</short_name>
+    <long_name>--clear</long_name>
+    <description>Clear the compiled directory of existing files.</description>
+    <action>StoreTrue</action>
+  </option>
 	<option name="verbose">
 		<short_name>-v</short_name>
 		<long_name>--verbose</long_name>
